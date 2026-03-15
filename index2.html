@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ServiceNow Support Portal</title>
+
+<style>
+
+body{
+font-family:Segoe UI;
+margin:0;
+background:#eef2f7;
+}
+
+/* NAVBAR */
+
+.navbar{
+background:#1f2d3d;
+color:white;
+padding:15px 25px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.navbar span{
+font-size:14px;
+opacity:0.8;
+}
+
+/* LOGIN */
+
+.login{
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+background:linear-gradient(120deg,#2c3e50,#4ca1af);
+}
+
+.login-box{
+background:white;
+padding:35px;
+width:320px;
+border-radius:10px;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin:8px 0;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+/* DASHBOARD */
+
+.container{
+background:white;
+margin:20px;
+padding:20px;
+border-radius:8px;
+box-shadow:0 5px 10px rgba(0,0,0,0.1);
+}
+
+.stats{
+display:flex;
+gap:20px;
+margin:20px;
+}
+
+.card{
+flex:1;
+background:white;
+padding:20px;
+border-radius:8px;
+box-shadow:0 5px 10px rgba(0,0,0,0.1);
+text-align:center;
+}
+
+.card h3{
+margin:0;
+color:#777;
+}
+
+.card p{
+font-size:26px;
+font-weight:bold;
+margin-top:10px;
+}
+
+/* BUTTONS */
+
+button{
+padding:8px 15px;
+background:#0078d4;
+border:none;
+color:white;
+border-radius:4px;
+cursor:pointer;
+}
+
+button:hover{
+background:#005fa3;
+}
+
+.delete{
+background:#e74c3c;
+}
+
+.delete:hover{
+background:#c0392b;
+}
+
+/* TABLE */
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #ddd;
+text-align:center;
+}
+
+th{
+background:#f4f6f9;
+}
+
+.status-open{
+color:#27ae60;
+font-weight:bold;
+}
+
+.status-closed{
+color:#e74c3c;
+font-weight:bold;
+}
+
+.search-box{
+margin-bottom:15px;
+}
+
+.hidden{
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- LOGIN PAGE -->
+
+<div id="loginPage" class="login">
+
+<div class="login-box">
+
+<h2>ServiceNow Portal</h2>
+
+<input type="text" id="username" placeholder="Username">
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<p id="msg"></p>
+
+</div>
+
+</div>
+
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="hidden">
+
+<div class="navbar">
+<h2>Support Ticket Dashboard</h2>
+<span id="welcomeUser"></span>
+<button onclick="logout()">Logout</button>
+</div>
+
+
+<!-- STATISTICS -->
+
+<div class="stats">
+
+<div class="card">
+<h3>Total Tickets</h3>
+<p id="totalTickets">0</p>
+</div>
+
+<div class="card">
+<h3>Open</h3>
+<p id="openTickets">0</p>
+</div>
+
+<div class="card">
+<h3>Closed</h3>
+<p id="closedTickets">0</p>
+</div>
+
+</div>
+
+
+<!-- CREATE TICKET -->
+
+<div class="container">
+
+<h3>Create Ticket</h3>
+
+<input type="text" id="title" placeholder="Ticket Title">
+
+<select id="issue">
+
+<option>Regarding Certificates</option>
+<option>Unable to login to platform</option>
+<option>404 Error</option>
+<option>Regarding User expired</option>
+
+</select>
+
+<button onclick="createTicket()">Submit Ticket</button>
+
+</div>
+
+
+<!-- TICKET TABLE -->
+
+<div class="container">
+
+<h3>Ticket History</h3>
+
+<input class="search-box" type="text" id="search" placeholder="Search tickets..." onkeyup="searchTicket()">
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Issue</th>
+<th>Group</th>
+<th>Date</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="ticketTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<script>
+
+const users = [
+{username:"admin",password:"1234"},
+{username:"niranjan",password:"2222"},
+{username:"katherine",password:"1111"}
+];
+
+let tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+let ticketID = tickets.length + 1;
+
+
+// LOGIN
+
+function login(){
+
+let user=document.getElementById("username").value;
+let pass=document.getElementById("password").value;
+
+let valid = users.find(u => u.username===user && u.password===pass);
+
+if(valid){
+
+document.getElementById("loginPage").classList.add("hidden");
+document.getElementById("dashboard").classList.remove("hidden");
+
+document.getElementById("welcomeUser").innerHTML="Welcome "+user;
+
+loadTickets();
+}
+else{
+document.getElementById("msg").innerHTML="Invalid Login";
+}
+
+}
+
+
+// LOGOUT
+
+function logout(){
+location.reload();
+}
+
+
+// CREATE TICKET
+
+function createTicket(){
+
+let title=document.getElementById("title").value;
+let issue=document.getElementById("issue").value;
+
+let group=issue==="Regarding Certificates" ? "Certificates Team":"Platform Team";
+
+let ticket={
+id:ticketID++,
+title:title,
+issue:issue,
+group:group,
+date:new Date().toLocaleDateString(),
+status:"Open"
+};
+
+tickets.push(ticket);
+
+localStorage.setItem("tickets",JSON.stringify(tickets));
+
+loadTickets();
+
+}
+
+
+// LOAD TICKETS
+
+function loadTickets(){
+
+let table=document.getElementById("ticketTable");
+table.innerHTML="";
+
+let open=0;
+let closed=0;
+
+tickets.forEach((ticket,index)=>{
+
+let row=table.insertRow();
+
+row.insertCell(0).innerHTML=ticket.id;
+row.insertCell(1).innerHTML=ticket.title;
+row.insertCell(2).innerHTML=ticket.issue;
+row.insertCell(3).innerHTML=ticket.group;
+row.insertCell(4).innerHTML=ticket.date;
+
+let statusCell=row.insertCell(5);
+
+if(ticket.status==="Open"){
+statusCell.innerHTML="<span class='status-open'>Open</span>";
+open++;
+}
+else{
+statusCell.innerHTML="<span class='status-closed'>Closed</span>";
+closed++;
+}
+
+row.insertCell(6).innerHTML=
+"<button onclick='closeTicket("+index+")'>Close</button> "+
+"<button class='delete' onclick='deleteTicket("+index+")'>Delete</button>";
+
+});
+
+document.getElementById("totalTickets").innerHTML=tickets.length;
+document.getElementById("openTickets").innerHTML=open;
+document.getElementById("closedTickets").innerHTML=closed;
+
+}
+
+
+// CLOSE TICKET
+
+function closeTicket(index){
+
+tickets[index].status="Closed";
+
+localStorage.setItem("tickets",JSON.stringify(tickets));
+
+loadTickets();
+
+}
+
+
+// DELETE TICKET
+
+function deleteTicket(index){
+
+tickets.splice(index,1);
+
+localStorage.setItem("tickets",JSON.stringify(tickets));
+
+loadTickets();
+
+}
+
+
+// SEARCH
+
+function searchTicket(){
+
+let input=document.getElementById("search").value.toLowerCase();
+
+let rows=document.querySelectorAll("#ticketTable tr");
+
+rows.forEach(row=>{
+row.style.display=row.innerText.toLowerCase().includes(input)?"":"none";
+});
+
+}
+
+</script>
+
+</body>
+</html>

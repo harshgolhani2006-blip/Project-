@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>ServiceNow Portal</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div id="notification"></div>
+
+<!-- LOGIN -->
+
+<div id="loginPage" class="login">
+
+<div class="login-box">
+
+<h2>ServiceNow Portal</h2>
+
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<p id="msg"></p>
+
+</div>
+</div>
+
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="hidden">
+
+<div class="navbar">
+
+<h2>Support Dashboard</h2>
+
+<span id="welcomeUser"></span>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+
+<!-- STATS -->
+
+<div class="stats">
+
+<div class="card">
+<h3>Total</h3>
+<p id="totalTickets">0</p>
+</div>
+
+<div class="card">
+<h3>Open</h3>
+<p id="openTickets">0</p>
+</div>
+
+<div class="card">
+<h3>Closed</h3>
+<p id="closedTickets">0</p>
+</div>
+
+</div>
+
+
+<!-- CHART -->
+
+<div class="container">
+
+<h3>Ticket Analytics</h3>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+
+<!-- CREATE TICKET -->
+
+<div class="container">
+
+<h3>Create Ticket</h3>
+
+<input id="title" placeholder="Title">
+
+<select id="issue">
+
+<option>Regarding Certificates</option>
+<option>Unable to login to platform</option>
+<option>404 Error</option>
+<option>Regarding User expired</option>
+
+</select>
+
+<select id="agent"></select>
+
+<button onclick="createTicket()">Create</button>
+
+</div>
+
+
+<!-- TICKET TABLE -->
+
+<div class="container">
+
+<h3>Ticket History</h3>
+
+<table>
+
+<thead>
+<tr>
+
+<th>ID</th>
+<th>Title</th>
+<th>Issue</th>
+<th>Group</th>
+<th>Agent</th>
+<th>Status</th>
+<th>Action</th>
+
+</tr>
+</thead>
+
+<tbody id="ticketTable"></tbody>
+
+</table>
+
+</div>
+
+
+<!-- USER MANAGEMENT -->
+
+<div class="container">
+
+<h3>User Management</h3>
+
+<input id="newUser" placeholder="Username">
+<input id="newPass" placeholder="Password">
+
+<select id="role">
+<option>Agent</option>
+<option>Admin</option>
+</select>
+
+<button onclick="addUser()">Add User</button>
+
+<table>
+
+<thead>
+<tr>
+
+<th>Username</th>
+<th>Role</th>
+<th>Action</th>
+
+</tr>
+</thead>
+
+<tbody id="userTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script src="database.js"></script>
+<script src="login.js"></script>
+<script src="tickets.js"></script>
+<script src="users.js"></script>
+<script src="agents.js"></script>
+<script src="chart.js"></script>
+<script src="notification.js"></script>
+
+</body>
+</html>
